@@ -81,6 +81,8 @@
 
                  if (id.hasClass(settings.modalTarget+'-on')) {
                     settings.beforeOpen();
+                    $(document).on('keyup', closeListener)
+                    
                     id.css({'opacity':settings.opacityIn,'z-index':settings.zIndexIn});
                     id.addClass(settings.animatedIn);  
                     id.one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', afterOpen);
@@ -89,12 +91,22 @@
         });
 
 
-
-        closeBt.click(function(event) {
+        function closeListener(event) {
             event.preventDefault();
+
+            /*
+             * if the event type is keyup and the escape key is not pressed,
+             * we don't close the modal
+             */
+            if (event.type === 'keyup' && event.keyCode !== 27) {
+                return
+            }
+
             $('body, html').css({'overflow':'auto'});
 
             settings.beforeClose(); //beforeClose
+            $(document).off('keyup', closeListener)
+            
             if (id.hasClass(settings.modalTarget+'-on')) {
                 id.removeClass(settings.modalTarget+'-on');
                 id.addClass(settings.modalTarget+'-off');
@@ -105,8 +117,9 @@
                 id.addClass(settings.animatedOut);
                 id.one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', afterClose);
             };
+        }
 
-        });
+        closeBt.click(closeListener);
 
         function afterClose () {       
             id.css({'z-index':settings.zIndexOut});
